@@ -1,9 +1,5 @@
-# Dockerfile — R Plumber API for R Research Assistant
-# Base image: Rocker R with all common packages pre-installed
-
 FROM rocker/r-ver:4.4.1
 
-# Install system dependencies for R packages
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -17,31 +13,15 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install R packages
-RUN Rscript -e "install.packages(c( \
-    'plumber', \
-    'jsonlite', \
-    'readxl', \
-    'dplyr', \
-    'tidyr', \
-    'ggplot2', \
-    'janitor', \
-    'car', \
-    'effectsize', \
-    'psych', \
-    'gtsummary', \
-    'gt' \
-  ), repos='https://cran.rstudio.com/', dependencies=TRUE)"
+RUN Rscript -e "install.packages('plumber', repos='https://cran.rstudio.com/', dependencies=TRUE)"
+RUN Rscript -e "install.packages('jsonlite', repos='https://cran.rstudio.com/', dependencies=TRUE)"
+RUN Rscript -e "install.packages(c('readxl','dplyr','tidyr','janitor'), repos='https://cran.rstudio.com/', dependencies=TRUE)"
+RUN Rscript -e "install.packages(c('car','effectsize','psych'), repos='https://cran.rstudio.com/', dependencies=TRUE)"
+RUN Rscript -e "install.packages(c('gtsummary','ggplot2','gt'), repos='https://cran.rstudio.com/', dependencies=TRUE)"
 
-# Create app directory
 WORKDIR /app
-
-# Copy API files
 COPY plumber.R .
 COPY entrypoint.R .
 
-# Expose port (Render sets PORT env var automatically)
 EXPOSE 8000
-
-# Start the API
 CMD ["Rscript", "entrypoint.R"]
