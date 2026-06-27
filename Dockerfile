@@ -12,15 +12,23 @@ RUN apt-get update && apt-get install -y \
     libblas-dev \
     libgmp-dev \
     libmpfr-dev \
+    libgsl-dev \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Install plumber FIRST
 RUN Rscript -e "install.packages('plumber', repos='https://cran.rstudio.com/')"
 RUN Rscript -e "library(plumber); cat('plumber OK\n')"
 
-# Install car dependencies explicitly first
-RUN Rscript -e "install.packages(c('MASS','nnet','pbkrtest','quantreg','lme4','MatrixModels','SparseM','abind'), repos='https://cran.rstudio.com/')"
-RUN Rscript -e "install.packages('car', repos='https://cran.rstudio.com/', dependencies=TRUE)"
+# Install Matrix and lme4 dependencies in strict order
+RUN Rscript -e "install.packages('Matrix', repos='https://cran.rstudio.com/')"
+RUN Rscript -e "install.packages('lme4', repos='https://cran.rstudio.com/')"
+RUN Rscript -e "library(lme4); cat('lme4 OK\n')"
+
+# Install car dependencies
+RUN Rscript -e "install.packages(c('pbkrtest','SparseM','quantreg','abind','nnet','MASS'), repos='https://cran.rstudio.com/')"
+RUN Rscript -e "install.packages('carData', repos='https://cran.rstudio.com/')"
+RUN Rscript -e "install.packages('car', repos='https://cran.rstudio.com/')"
 RUN Rscript -e "library(car); cat('car OK\n')"
 
 # Install remaining packages
