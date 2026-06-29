@@ -62,9 +62,9 @@ function(req) {
       timeout = 180
     )
     list(
-      success        = (attr(result, "status") %in% c(0, NULL)),
+      success        = (attr(result, "status") %in% c(0, NULL)) || nchar(paste(result, collapse = "\n")) > 0,
       raw_output     = paste(result, collapse = "\n"),
-      error_message  = if (!is.null(attr(result, "status")) && attr(result, "status") != 0)
+      error_message  = if (!is.null(attr(result, "status")) && attr(result, "status") != 0 && nchar(paste(result, collapse = "\n")) == 0)
                          paste(result, collapse = "\n") else NULL
     )
   }, error = function(e) {
